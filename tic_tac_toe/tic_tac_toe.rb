@@ -1,16 +1,29 @@
-
-
+#Tic Tac Toe with unbeatable AI
+#ruby 1.9.3
+ 
 # Keep track of player moves for AI
 @player_moves=[]
 
+# Variables to keep track of stats
+@player_wins=0
+@computer_wins=0
+@ties=0
+
 # This function putss out the board that it was passed.
 # "board" is a list of 10 strings representing the board, ignoring the index 0)
-def draw_board(board)   
+def print_board(board)   
+    puts(' ' + '7' + ' | ' + '8' + ' | ' + '9')
+    puts('-----------')
+    puts(' ' + '4' + ' | ' + '5' + ' | ' + '6')
+    puts('-----------')
+    puts(' ' + '1' + ' | ' + '2' + ' | ' + '3')
+    puts('')
     puts(' ' + board[7] + ' | ' + board[8] + ' | ' + board[9])
     puts('-----------')
     puts(' ' + board[4] + ' | ' + board[5] + ' | ' + board[6])
     puts('-----------')
     puts(' ' + board[1] + ' | ' + board[2] + ' | ' + board[3])
+
 end
 
 # Let's the player type which letter they want to be.
@@ -87,7 +100,11 @@ def get_player_move(board)
     
     while not '1 2 3 4 5 6 7 8 9'.split.include?(move) or not is_space_free(board, move.to_i) do 
         puts 'What is your next move? (1-9)'
-        move = gets.chomp    
+        move = gets.chomp
+        if is_space_free(board, move.to_i)
+            break
+        end
+        puts 'The space is already taken!'       
     end 
 
     @player_moves.push(move.to_i)
@@ -190,30 +207,36 @@ def is_board_full(board)
 end    
 
 puts 'Welcome to Tic Tac Toe!'
+player_letter,computer_letter = input_player_letter
 
 while true
     # Reset the board
-    the_board = [' '] * 10
-    player_letter,computer_letter = input_player_letter
-    turn = who_goes_first
-    puts 'The ' + turn + ' will go first.'
+    game_board = [' '] * 10
+    turn=who_goes_first
+    puts 'Computer has won ' + @computer_wins.to_s + ' times'
+    puts 'Player has won ' + @player_wins.to_s + ' times'
+    puts 'There has been ' + @ties.to_s + ' ties' 
+    puts ''
+    puts 'The '+turn + ' goes first.'
     game_is_playing = true
     
     while game_is_playing
         if turn == 'player'
             # Player's turn.
-            draw_board(the_board)
-            move = get_player_move(the_board)
+            print_board(game_board)
+            move = get_player_move(game_board)
             @previous_move=move
-            make_move(the_board, player_letter, move)
-            if is_winner(the_board, player_letter)
-                draw_board(the_board)
-                puts 'Hooray! You have won the game!'
+            make_move(game_board, player_letter, move)
+            if is_winner(game_board, player_letter)
+                print_board(game_board)
+                puts 'Player wins!'
+                @player_wins+=1
                 game_is_playing = false
             else
-                if is_board_full(the_board)
-                    draw_board(the_board)
+                if is_board_full(game_board)
+                    print_board(game_board)
                     puts 'The game is a tie!'
+                    @ties+=1
                     break
                 else
                     turn = 'computer' 
@@ -221,16 +244,18 @@ while true
             end                   
         else
             # Computer's turn.
-            move = get_computer_move(the_board, computer_letter)
-            make_move(the_board, computer_letter, move)
-            if is_winner(the_board, computer_letter)
-                draw_board(the_board)
-                puts 'The computer has beaten you! You lose.'
+            move = get_computer_move(game_board, computer_letter)
+            make_move(game_board, computer_letter, move)
+            if is_winner(game_board, computer_letter)
+                print_board(game_board)
+                puts 'Computer wins!'
+                @computer_wins+=1
                 game_is_playing = false
             else
-                if is_board_full(the_board)
-                    draw_board(the_board)
+                if is_board_full(game_board)
+                    print_board(game_board)
                     puts 'The game is a tie!'
+                    @ties+=1
                     break
                 else
                     turn = 'player'
@@ -240,6 +265,7 @@ while true
     end
 
     if not play_again
+        puts 'Thanks for playing!'
         break
     end  
 end
